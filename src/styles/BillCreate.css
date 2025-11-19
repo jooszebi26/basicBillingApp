@@ -1,0 +1,192 @@
+
+
+.page-container.bill-create-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+
+.page-alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.page-alert--error {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-weight: 500;
+}
+
+
+
+.form-card.bill-create-form {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem 1.5rem 1.5rem;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.06),
+    0 0 0 1px rgba(148, 163, 184, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-row--inline {
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.form-row--inline .form-field {
+  flex: 1;
+}
+
+
+
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  outline: none;
+  background-color: #f9fafb;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.05s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+  transform: translateY(-1px);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.form-textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+
+
+.primary-button,
+.secondary-button {
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  padding: 0.55rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+
+
+.primary-button {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.4);
+}
+
+.primary-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.secondary-button {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.secondary-button:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+
+
+.form-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+
+
+@media (max-width: 640px) {
+  .form-row--inline {
+    flex-direction: column;
+  }
+
+  .form-card.bill-create-form {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+}
