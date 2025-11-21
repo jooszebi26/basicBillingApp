@@ -46,7 +46,7 @@ const RegisterPage = () => {
     if (registerRes) {
       navigate("/login");      // <--- SAJÁT REDIRECT
     } else {
-      setError("Hibás regisztrció!");
+      setError("Hibás regisztráció!");
     }
   };
 
