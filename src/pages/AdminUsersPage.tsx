@@ -15,7 +15,9 @@ const AdminUsersPage: React.FC = () => {
   const [savingUser, setSavingUser] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
 
-  // Globális szerepkörök – de ADMIN-t később kiszűrjük admin sor esetén
+  // ideiglenes, még el nem mentett szerepkörök
+  const [draftRoles, setDraftRoles] = useState<Record<string, string[]>>({});
+
   const AVAILABLE_ROLES = ["USER", "ACCOUNTANT"];
 
   useEffect(() => {
@@ -40,14 +42,7 @@ const AdminUsersPage: React.FC = () => {
     }
   };
 
-  const handleRolesChange = (username: string, selected: string[]) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.username === username ? { ...u, roles: selected } : u
-      )
-    );
-  };
-
+  // ⬇️ Normál multi-select viselkedés: azt tároljuk, ami ténylegesen ki van jelölve
   const handleRolesSelectChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
     username: string
@@ -55,13 +50,34 @@ const AdminUsersPage: React.FC = () => {
     const selectedRoles = Array.from(e.target.selectedOptions).map(
       (opt) => opt.value
     );
-    handleRolesChange(username, selectedRoles);
+
+    setDraftRoles((prev) => ({
+      ...prev,
+      [username]: selectedRoles,
+    }));
   };
 
   const handleSaveRoles = async (user: AdminUser) => {
+    // ha van draft, azt mentjük, különben a jelenlegi szerepköröket
+    const newRoles = draftRoles[user.username] ?? user.roles ?? [];
+
     try {
       setSavingUser(user.username);
-      await updateUserRoles(user.username, user.roles ?? []);
+      await updateUserRoles(user.username, newRoles);
+
+      // itt frissítjük ténylegesen a users state-et
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.username === user.username ? { ...u, roles: newRoles } : u
+        )
+      );
+
+      // mentés után töröljük a draft-ot ehhez a userhez
+      setDraftRoles((prev) => {
+        const copy = { ...prev };
+        delete copy[user.username];
+        return copy;
+      });
     } catch (err) {
       setError("Nem sikerült elmenteni a szerepkör módosítást.");
     } finally {
@@ -79,6 +95,13 @@ const AdminUsersPage: React.FC = () => {
       setDeletingUser(user.username);
       await deleteUser(user.username);
       setUsers((prev) => prev.filter((u) => u.username !== user.username));
+
+      // töröljük a draft-ot is, ha volt
+      setDraftRoles((prev) => {
+        const copy = { ...prev };
+        delete copy[user.username];
+        return copy;
+      });
     } catch (err) {
       setError("Nem sikerült törölni a felhasználót.");
     } finally {
@@ -165,33 +188,49 @@ const AdminUsersPage: React.FC = () => {
           <tbody>
             {users.map((user) => {
               const roles = user.roles ?? [];
-              const isAdminRow = roles.includes("ADMIN"); // Admin felhasználó
+              const isAdminRow = roles.includes("ADMIN");
 
-              // 🔥 ADMIN-nál ne jelenjen meg ADMIN a selectben
+              // a selectben a még el nem mentett (draft) érték jelenjen meg, ha van,
+              // különben a mentett szerepkörök
+              const currentRoles =
+                draftRoles[user.username] ?? roles ?? [];
+
               const roleOptionsForUser = isAdminRow
                 ? AVAILABLE_ROLES.filter((r) => r !== "ADMIN")
                 : AVAILABLE_ROLES;
 
               return (
                 <tr key={user.username}>
-                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
+                  <td
+                    style={{ padding: "8px", borderBottom: "1px solid #eee" }}
+                  >
                     {user.name}
                   </td>
 
-                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
+                  <td
+                    style={{ padding: "8px", borderBottom: "1px solid #eee" }}
+                  >
                     {user.username}
                   </td>
 
-                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
-                    {roles.length === 0 ? "Nincs szerepkör" : roles.join(", ")}
+                  <td
+                    style={{ padding: "8px", borderBottom: "1px solid #eee" }}
+                  >
+                    {roles.length === 0
+                      ? "Nincs szerepkör"
+                      : roles.join(", ")}
                   </td>
 
-                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
+                  <td
+                    style={{ padding: "8px", borderBottom: "1px solid #eee" }}
+                  >
                     <select
                       multiple
-                      value={roles}
-                      onChange={(e) => handleRolesSelectChange(e, user.username)}
-                      disabled={isAdminRow} // Admin tilos
+                      value={currentRoles}
+                      onChange={(e) =>
+                        handleRolesSelectChange(e, user.username)
+                      }
+                      disabled={isAdminRow}
                       style={{
                         width: "100%",
                         minHeight: "70px",
@@ -214,7 +253,9 @@ const AdminUsersPage: React.FC = () => {
                     )}
                   </td>
 
-                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
+                  <td
+                    style={{ padding: "8px", borderBottom: "1px solid #eee" }}
+                  >
                     <button
                       onClick={() => handleSaveRoles(user)}
                       disabled={savingUser === user.username || isAdminRow}
