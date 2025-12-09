@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -17,7 +15,8 @@ const AdminUsersPage: React.FC = () => {
   const [savingUser, setSavingUser] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
 
-  const AVAILABLE_ROLES = ["USER", "ACCOUNTANT", "ADMIN"];
+  // Globális szerepkörök – de ADMIN-t később kiszűrjük admin sor esetén
+  const AVAILABLE_ROLES = ["USER", "ACCOUNTANT"];
 
   useEffect(() => {
     loadUsers();
@@ -27,7 +26,7 @@ const AdminUsersPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await getAllUsers();
-      
+
       setUsers(
         data.map((u) => ({
           ...u,
@@ -162,82 +161,60 @@ const AdminUsersPage: React.FC = () => {
               </th>
             </tr>
           </thead>
+
           <tbody>
             {users.map((user) => {
               const roles = user.roles ?? [];
-              const isAdminRow = roles.includes("ADMIN"); 
+              const isAdminRow = roles.includes("ADMIN"); // Admin felhasználó
+
+              // 🔥 ADMIN-nál ne jelenjen meg ADMIN a selectben
+              const roleOptionsForUser = isAdminRow
+                ? AVAILABLE_ROLES.filter((r) => r !== "ADMIN")
+                : AVAILABLE_ROLES;
 
               return (
                 <tr key={user.username}>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
+                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
                     {user.name}
                   </td>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
+
+                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
                     {user.username}
                   </td>
 
-                  
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    {roles.length === 0
-                      ? "Nincs szerepkör"
-                      : roles.join(", ")}
+                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
+                    {roles.length === 0 ? "Nincs szerepkör" : roles.join(", ")}
                   </td>
 
-                  
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
+                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
                     <select
                       multiple
                       value={roles}
-                      onChange={(e) =>
-                        handleRolesSelectChange(e, user.username)
-                      }
-                      disabled={isAdminRow} 
+                      onChange={(e) => handleRolesSelectChange(e, user.username)}
+                      disabled={isAdminRow} // Admin tilos
                       style={{
                         width: "100%",
                         minHeight: "70px",
                         padding: "4px",
-                        backgroundColor: isAdminRow ? "#f9fafb" : "white",
+                        backgroundColor: isAdminRow ? "#f3f4f6" : "white",
                         cursor: isAdminRow ? "not-allowed" : "pointer",
                       }}
                     >
-                      {AVAILABLE_ROLES.map((role) => (
+                      {roleOptionsForUser.map((role) => (
                         <option key={role} value={role}>
                           {role}
                         </option>
                       ))}
                     </select>
+
                     {isAdminRow && (
                       <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                        Admin szerepkör nem módosítható.
+                        Az ADMIN szerepkör nem módosítható.
                       </div>
                     )}
                   </td>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
+
+                  <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>
                     <button
                       onClick={() => handleSaveRoles(user)}
                       disabled={savingUser === user.username || isAdminRow}
